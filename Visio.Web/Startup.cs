@@ -87,50 +87,7 @@ namespace Visio.Web
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger, IServiceProvider serviceProvider)
         {
 
-            //// Debugging: Fetch Images from CosmosDB on Startup
-            //using (var scope = serviceProvider.CreateScope())
-            //{
-            //    var imageRepository = scope.ServiceProvider.GetRequiredService<IImageRepository>();
-
-            //    Task.Run(async () =>
-            //    {
-
-            //        var imageEntity = new ImageEntity
-            //        {
-            //            ObjectPath = "images/sample.png",
-            //            ObjectSize = "500KB",
-            //            Labels = new List<string> { "Cat", "Animal" },
-            //            Status = ImageStatus.New
-            //        };
-
-            //        var addedImage = await imageRepository.AddAsync(imageEntity);
-
-            //        var images = await imageRepository.ListAsync();
-            //        foreach (var image in images)
-            //        {
-            //            logger.LogInformation($"[DEBUG] Image ID: {image.Id}, Path: {image.ObjectPath}");
-            //        }
-            //    }).Wait();
-            //}
-
-            //using (var scope = serviceProvider.CreateScope())
-            //{
-            //    var storage = scope.ServiceProvider.GetRequiredService<IStorageService>();
-
-            //    Task.Run(async () =>
-            //    {
-            //        using var fileStream = File.OpenRead("s3_test_photo.jpg");
-            //        var filemeta = new FileMetadata
-            //        {
-            //            FileName = "s3_test_photo.jpg"
-            //        };
-
-            //        var addedImage = await storage.CreateAsync(fileStream, filemeta);
-
-
-            //    }).Wait();
-            //}
-
+            // Debugging: Fetch Images from CosmosDB 
             using (var scope = serviceProvider.CreateScope())
             {
                 var service = scope.ServiceProvider.GetRequiredService<IImageService>();

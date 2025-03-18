@@ -16,7 +16,6 @@ namespace Visio.Recognition
 {
     public class VisionRecognitionFunction
     {
-
         private static readonly string AzureBlobSharedAccessToken = Environment.GetEnvironmentVariable("AzureBlobStorageOptions.SharedAccessToken");
         private static readonly string CompureVisionApiKeyServiceClientCredentials = Environment.GetEnvironmentVariable("AzureBlobStorageOptions.SharedAccessToken");
         private static readonly string CompureVisionEndpoint = Environment.GetEnvironmentVariable("AzureBlobStorageOptions.SharedAccessToken");
@@ -61,6 +60,8 @@ namespace Visio.Recognition
 
                 log.LogInformation("Image recognized: {Description}", string.Join(",", tags));
 
+                //TODO: Update via ImageRepository item in CosmosDb
+
                 await messageActions.CompleteMessageAsync(message);
             }
             catch (Exception ex)
@@ -68,8 +69,5 @@ namespace Visio.Recognition
                 log.LogError(ex, "Error processing image recognition");
             }
         }
-
-
-
     }
 }
