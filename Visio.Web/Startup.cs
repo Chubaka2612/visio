@@ -88,25 +88,6 @@ namespace Visio.Web
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger, IServiceProvider serviceProvider)
         {
 
-            //// Debugging: Fetch Images from CosmosDB 
-            //using (var scope = serviceProvider.CreateScope())
-            //{
-            //    var service = scope.ServiceProvider.GetRequiredService<IImageService>();
-
-            //    Task.Run(async () =>
-            //    {
-            //        using var fileStream = File.OpenRead("s3_test_photo.jpg");
-            //        var filemeta = new FileMetadata
-            //        {
-            //            FileName = "s3_test_photo.jpg",
-            //            Size = fileStream.Length
-            //        };
-
-            //        var addedImage = await service.CreateAsync(fileStream, filemeta);
-
-            //    }).Wait();
-            //}
-
             app.UseStaticFiles();
             app.UseRouting();
 
