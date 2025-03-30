@@ -1,0 +1,17 @@
+﻿@model Visio.Data.Core.FileMetadata
+
+@{
+    ViewData["Title"] = "Add Image";
+}
+
+<h3>Add a New Image for Recognition</h3>
+
+<form method="post" enctype="multipart/form-data">
+    <div class="form-group mb-3">
+        <label for="file">Select Image</label>
+        <input type="file" id="file" name="file" class="input form-control" accept="image/*" />
+        <small class="form-text text-muted">Only image files are allowed (JPG, JPEG, PNG, etc.).</small>
+    </div>
+
+    <button type="submit" class="button card-button">Add</button>
+</form>

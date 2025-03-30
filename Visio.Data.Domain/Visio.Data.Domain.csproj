@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="log4net" Version="3.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Visio.Data\Visio.Data.Core.csproj" />
     <ProjectReference Include="..\Visio.Domain.Common\Visio.Domain.Common.csproj" />
   </ItemGroup>

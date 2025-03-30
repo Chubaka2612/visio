@@ -1,0 +1,73 @@
+﻿@using Visio.Web.Models
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Visio</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/menu.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/common.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/cards.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/table.css" asp-append-version="true" />
+</head>
+<body>
+    <!-- Centered Header Section -->
+    <header class="text-center my-4">
+        @if (IsSectionDefined("Header"))
+        {
+            @RenderSection("Header", required: false)
+        }
+        else
+        {
+            <h1>Welcome to Visio</h1>
+        }
+    </header>
+
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Sidebar Menu Section -->
+            <aside class="col-md-3">
+                <nav class="menu stylish-menu">
+                    <p class="menu-label">GENERAL MENU</p>
+                    <ul class="menu-list">
+                        <li><a href="/">Home</a></li>
+                        <li>
+                            <a href="#">Images</a>
+                            <ul>
+                                <li><a href="/Images/Index">List</a></li>
+                                <li><a href="/Images/Search">Search</a></li>
+                                <li><a href="/Images/Create">Add</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Content Section -->
+            <main role="main" class="col-md-12 pb-3">
+                @if (Context.Request.RouteValues["controller"]?.ToString() != "Home")
+                {
+                    @await Component.InvokeAsync(typeof(Visio.Web.Models.BreadcrumbViewComponent), new { viewContext = ViewContext })
+                }
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <footer class="text-center mt-4 py-3" style="position: fixed; width: 100%; bottom: 0; background-color: #f8f9fa;">
+        @if (IsSectionDefined("Footer"))
+        {
+            @RenderSection("Footer", required: false)
+        }
+        else
+        {
+            <p>&copy; 2025 Visio Traders. All rights reserved.</p>
+        }
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

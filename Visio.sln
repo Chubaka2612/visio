@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Visio.Services", "Visio.Ser
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Visio.Recognition", "Visio.Recognition\Visio.Recognition.csproj", "{16BF5B49-BA37-44A7-A869-EC52373AC81F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Visio.Tests", "Visio.Tests\Visio.Tests.csproj", "{BB1B7C71-C6FB-494B-A16E-1D0DF05E426D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{16BF5B49-BA37-44A7-A869-EC52373AC81F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16BF5B49-BA37-44A7-A869-EC52373AC81F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16BF5B49-BA37-44A7-A869-EC52373AC81F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB1B7C71-C6FB-494B-A16E-1D0DF05E426D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB1B7C71-C6FB-494B-A16E-1D0DF05E426D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB1B7C71-C6FB-494B-A16E-1D0DF05E426D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB1B7C71-C6FB-494B-A16E-1D0DF05E426D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +82,7 @@ Global
 		{B53BF34F-9568-4A90-8E1E-897FF5B3CD1C} = {A331BA46-62F1-499A-8683-693ED7D2D73B}
 		{AA1E1383-E62C-4ABB-A2FA-D6E90802D794} = {1169F1F5-C5F2-409F-A5C4-207E6CCCF524}
 		{16BF5B49-BA37-44A7-A869-EC52373AC81F} = {1169F1F5-C5F2-409F-A5C4-207E6CCCF524}
+		{BB1B7C71-C6FB-494B-A16E-1D0DF05E426D} = {0AED0CDA-516C-468F-A603-206477FA2467}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {76566F75-F793-427B-BAEB-9B5D65B0D656}

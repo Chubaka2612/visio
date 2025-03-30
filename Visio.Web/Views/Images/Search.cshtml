@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Search Images";
+}
+
+<h3>Search Images by Label</h3>
+
+<form method="post" asp-action="Search" class="form-inline">
+
+    <div class="field">
+        <label for="label" class="label">Input Label to Search</label>
+        <div class="control">
+            <input type="text" id="label" name="label" class="input" />
+        </div>
+    </div>
+
+    <button type="submit" class="button card-button">Search</button>
+</form>
+
+@if (!string.IsNullOrEmpty(ViewData["Message"] as string))
+{
+    <div class="alert alert-info mt-3">
+        @ViewData["Message"]
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(ViewData["ErrorMessage"] as string))
+{
+    <div class="alert alert-danger mt-3">
+        @ViewData["ErrorMessage"]
+    </div>
+}

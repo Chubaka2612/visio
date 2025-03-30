@@ -17,6 +17,7 @@ namespace Visio.Recognition.Services
 
         public async Task<List<string>> RecognizeImageAsync(string imageUrl)
         {
+         
             var analysis = await _computerVisionClient.AnalyzeImageAsync(imageUrl, [VisualFeatureTypes.Tags]);
 
             if (analysis.Tags.Count == 0)

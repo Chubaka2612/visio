@@ -1,0 +1,23 @@
+﻿@model IEnumerable<Visio.Domain.Common.Images.ConsolidatedImage>
+
+@{
+    ViewData["Title"] = "Search Results";
+}
+
+<h3>Search Results</h3>
+
+@if (Model != null && Model.Any())
+{
+    <div class="card-section-container">
+        <div class="card-container">
+            @foreach (var image in Model)
+            {
+                @await Html.PartialAsync("_ImageCard", image)
+            }
+        </div>
+    </div>
+}
+else
+{
+    <p>No images found for the given label.</p>
+}

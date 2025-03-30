@@ -1,0 +1,50 @@
+/* Styling the menu container */
+.stylish-menu {
+    background-color: transparent;
+    padding: 1rem;
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-family: 'Arial', sans-serif;
+    box-shadow: none;
+    border-radius: 0;
+}
+    /* Styling the menu labels */
+    .stylish-menu .menu-label {
+        font-weight: 600;
+        color: #343a40;
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+    }
+
+    /* Styling the menu links */
+    .stylish-menu .menu-list {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+        .stylish-menu .menu-list a {
+            color: #343a40;
+            text-decoration: none;
+            font-size: 1.1rem;
+            display: block;
+            padding: 0.5rem;
+            transition: background-color 0.3s, color 0.3s;
+            font-family: 'Arial', sans-serif;
+        }
+
+            .stylish-menu .menu-list a:hover {
+                background-color: #e0e0e0;
+                color: #000;
+            }
+
+        /* Nested submenu styling */
+        .stylish-menu .menu-list ul {
+            padding-left: 1.5rem;
+            list-style-type: none;
+        }
+
+            .stylish-menu .menu-list ul li {
+                margin-top: 0.5rem;
+            }

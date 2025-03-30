@@ -1,5 +1,6 @@
 ﻿
 using Azure.Messaging.ServiceBus;
+using log4net;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -9,18 +10,15 @@ namespace Visio.Services.Notifications
     {
         private readonly ServiceBusClient _busClient;
         public  ServiceBusOptions Options { get; set; }
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(NotificationProducer));
 
-        private readonly ILogger<NotificationProducer> _logger;
-
-        public NotificationProducer(ServiceBusOptions options, ILogger<NotificationProducer> logger)
+        public NotificationProducer(ServiceBusOptions options)
         {
             ArgumentNullException.ThrowIfNull(options);
             ArgumentNullException.ThrowIfNull(options.ConnectionString);
             ArgumentNullException.ThrowIfNull(options.QueueName);
-            ArgumentNullException.ThrowIfNull(logger);
 
             Options = options;
-            _logger = logger;
             _busClient = new ServiceBusClient(options.ConnectionString);
         }
 
@@ -43,11 +41,11 @@ namespace Visio.Services.Notifications
                 var queueMessage = new ServiceBusMessage(new BinaryData(serializedMessage));
 
                 await sender.SendMessageAsync(queueMessage);
-                _logger.LogInformation("A message was sent to the queue '{QueueName}'", queueName);
+                _logger.InfoFormat("A message was sent to the queue '{QueueName}'", queueName);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An exception occurred when sending a message to the queue '{QueueName}'", queueName);
+                _logger.ErrorFormat(ex.Message, "An exception occurred when sending a message to the queue '{QueueName}'", queueName);
                 throw;
             }
         }

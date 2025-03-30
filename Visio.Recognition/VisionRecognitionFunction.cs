@@ -4,35 +4,43 @@ using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Azure.WebJobs.ServiceBus;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Visio.Recognition.Services;
 using Visio.Domain.Common;
-
+using Visio.Services.ImageService;
+using Visio.Data.Domain.Images;
+using Microsoft.Azure.Cosmos;
+using Visio.Data.Core.Db;
 
 namespace Visio.Recognition
 {
     public class VisionRecognitionFunction
     {
         private static readonly string AzureBlobSharedAccessToken = Environment.GetEnvironmentVariable("AzureBlobStorageOptions.SharedAccessToken");
-        private static readonly string CompureVisionApiKeyServiceClientCredentials = Environment.GetEnvironmentVariable("AzureBlobStorageOptions.SharedAccessToken");
-        private static readonly string CompureVisionEndpoint = Environment.GetEnvironmentVariable("AzureBlobStorageOptions.SharedAccessToken");
+        private static readonly string CompureVisionApiKeyServiceClientCredentials = Environment.GetEnvironmentVariable("CompureVision.ApiKeyServiceClientCredentials");
+        private static readonly string CompureVisionEndpoint = Environment.GetEnvironmentVariable("CompureVision.Endpoint");
+
+        private static readonly string AzureCosmosConnectionString = Environment.GetEnvironmentVariable("AzureCosmosOptions.ConnectionString");
+        private static readonly string AzureCosmosDatabaseId = Environment.GetEnvironmentVariable("AzureCosmosOptions.DatabaseId");
 
         [FunctionName(nameof(VisionRecognitionFunction))]
         public async Task Run([ServiceBusTrigger("visiotesttopic", "visiotestsbs", Connection = "AzureServiceBusConnection")] ServiceBusReceivedMessage message,
             ServiceBusMessageActions messageActions,
             ILogger log)
         {
-            //TODO: DI of imageRecognitionService, imageService
-            //Investigate DI + Functions Net8 
-            var computerVisionClient = new ComputerVisionClient(new ApiKeyServiceClientCredentials(CompureVisionApiKeyServiceClientCredentials))
-            {
-                Endpoint = CompureVisionApiKeyServiceClientCredentials
-            };
-            var imageRecognitionService = new ImageRecognitionService(computerVisionClient);
+            var imageRecognitionService = new ImageRecognitionService(
+                new ComputerVisionClient(new ApiKeyServiceClientCredentials(CompureVisionApiKeyServiceClientCredentials))
+                {
+                    Endpoint = CompureVisionEndpoint
+                });
 
+            var imageService = new ImageService(new ImageDbRepository(new RepositoryOptions
+            {
+                CosmosClient = new CosmosClient(AzureCosmosConnectionString),
+                DatabaseId = AzureCosmosDatabaseId
+            }));
             try
             {
                 var requestData = JsonConvert.DeserializeObject<Notification>(message.Body.ToString());
@@ -60,7 +68,7 @@ namespace Visio.Recognition
 
                 log.LogInformation("Image recognized: {Description}", string.Join(",", tags));
 
-                //TODO: Update via ImageRepository item in CosmosDb
+                await imageService.UpdateImageLabelsAsync(requestData.Content.Id, tags);
 
                 await messageActions.CompleteMessageAsync(message);
             }

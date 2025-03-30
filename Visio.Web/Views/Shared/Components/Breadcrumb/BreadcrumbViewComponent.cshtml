@@ -1,0 +1,20 @@
+﻿@using Visio.Web.Models
+@model List<Breadcrumb>
+
+<nav aria-label="breadcrumb" class="breadcrumb-container">
+    <ol class="breadcrumb">
+        @foreach (var crumb in Model)
+        {
+            <li class="breadcrumb-item">
+                @if (crumb.RouteId != null)
+                {
+                    <a href="@Url.Action(crumb.Action, crumb.Controller, new { id = crumb.RouteId })">@crumb.Label</a>
+                }
+                else
+                {
+                    <a href="@Url.Action(crumb.Action, crumb.Controller)">@crumb.Label</a>
+                }
+            </li>
+        }
+    </ol>
+</nav>

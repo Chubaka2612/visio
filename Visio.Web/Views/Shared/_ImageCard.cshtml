@@ -1,0 +1,41 @@
+﻿@model Visio.Domain.Common.Images.ConsolidatedImage
+
+<div class="card">
+    <a asp-action="Get" asp-route-id="@Model.ImageEntity.Id" class="card-link">
+        <h2 class="card-title">Details</h2>
+    </a>
+    @if (Model.Stream != null)
+    {
+        var base64String = "";
+        using (var memoryStream = new MemoryStream())
+        {
+            await Model.Stream.CopyToAsync(memoryStream);
+            base64String = Convert.ToBase64String(memoryStream.ToArray());
+        }
+
+        <div class="image-container">
+            <img src="data:image/png;base64,@base64String" alt="Image" class="card-image" />
+        </div>
+    }
+    else
+    {
+        <span>No Image Available</span>
+    }
+
+    <div class="card-description">
+        <strong>Labels:</strong>
+        @if (Model.ImageEntity.Labels != null && Model.ImageEntity.Labels.Any())
+        {
+            @string.Join(", ", Model.ImageEntity.Labels)
+        }
+        else
+        {
+            <p>No labels available</p>
+        }
+    </div>
+
+    <!-- Delete Button -->
+    <form method="post" asp-controller="Images" asp-action="Delete" asp-route-id="@Model.ImageEntity.Id" onsubmit="return confirm('Are you sure you want to delete this image?');">
+        <button type="submit" class="btn btn-danger mt-2">Delete</button>
+    </form>
+</div>

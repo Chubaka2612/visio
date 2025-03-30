@@ -1,0 +1,30 @@
+﻿@model IEnumerable<Visio.Domain.Common.Images.ConsolidatedImage>
+
+@{
+    ViewData["Title"] = "Images";
+}
+
+@section Footer {
+    <div class="footer-warning">
+        <p class="form-text text-muted">Note: You cannot edit images.</p>
+    </div>
+}
+
+<h3 class="title">All Images</h3>
+
+<!-- Delete All Button -->
+@if (Model.Any())
+{
+    <form method="post" asp-controller="Images" asp-action="DeleteAll" onsubmit="return confirm('Are you sure you want to delete ALL images?');">
+        <button type="submit" class="btn btn-danger mb-3">Delete All</button>
+    </form>
+}
+
+<div class="card-section-container">
+    <div class="card-container">
+        @foreach (var image in Model)
+        {
+            @await Html.PartialAsync("_ImageCard", image)
+        }
+    </div>
+</div>

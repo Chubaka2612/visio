@@ -1,0 +1,15 @@
+﻿@model Visio.Domain.Common.Images.ConsolidatedImage
+
+@{
+    ViewData["Title"] = "Image Metadata";
+}
+
+<h3 class="title">Image Metadata</h3>
+
+<ul class="list-group">
+    <li class="list-group-item"><strong>Object Path:</strong> @Model.ImageEntity.ObjectPath</li>
+    <li class="list-group-item"><strong>Object Size:</strong> @Model.ImageEntity.ObjectSize</li>
+    <li class="list-group-item"><strong>Last Updated:</strong> @Model.ImageEntity.TimeUpdated.ToString("yyyy-MM-dd HH:mm:ss")</li>
+    <li class="list-group-item"><strong>Labels:</strong> @(Model.ImageEntity.Labels?.Any() == true ? string.Join(", ", Model.ImageEntity.Labels) : "No Labels")</li>
+    <li class="list-group-item"><strong>Status:</strong> @Model.ImageEntity.Status</li>
+</ul>

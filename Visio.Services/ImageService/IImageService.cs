@@ -7,13 +7,16 @@ namespace Visio.Services.ImageService
     {
         Task<string> CreateAsync(Stream fileStream, FileMetadata metadata);
 
-        Task<Stream> GetAsync(string id);
+        Task<ConsolidatedImage> GetAsync(string id);
 
         Task DeleteAsync(string id);
 
         Task DeleteAllAsync();
 
-        Task<IEnumerable<ImageEntity>> SearchAsync(string label);
+        Task<IEnumerable<ConsolidatedImage>> SearchAsync(string label);
 
+        Task UpdateImageLabelsAsync(string imageId, List<string> labels);
+
+        Task<IEnumerable<ConsolidatedImage>> GetAllImagesAsync();
     }
 }

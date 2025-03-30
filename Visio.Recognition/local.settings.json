@@ -1,0 +1,21 @@
+{
+  "IsEncrypted": false,
+
+  //TODO: hide
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_INPROC_NET8_ENABLED": "1",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+   
+    "AzureCosmosOptions.ConnectionString": "AccountEndpoint=https://cosmos-test-eastus-visio.documents.azure.com:443/;AccountKey=25yAIFDD5bFudzRsAjm0INk4333z3G9WsrdkkdyRBPyzmfSgNlq1GM5nWW9DCC7sszzlMfwxMtyFACDbRj7QEg==;",
+    "AzureCosmosOptions.DatabaseId": "visio-images-test",
+   
+    "AzureBlobStorageOptions.SharedAccessToken": "sp=r&st=2025-03-18T14:56:58Z&se=2026-03-31T21:56:58Z&spr=https&sv=2024-11-04&sr=c&sig=XoquoYTKg5LAccDC7WbWeaveOXEokGHvBBI4TEUmCHk%3D",
+    "CompureVision.ApiKeyServiceClientCredentials": "IUXpaX5dP1eWMbINRcW1wD7gLrmg3Z667iFJBl5BahVXSTkZQXA4JQQJ99BCACHYHv6XJ3w3AAAFACOGXgbe",
+    "CompureVision.Endpoint": "https://visio-computer-vision-eastus2.cognitiveservices.azure.com/"
+  },
+  "ConnectionStrings": {
+    "AzureServiceBusConnection": "Endpoint=sb://visiotesteussb.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=1ETWrrK7UIIel0L8WyJvuzBC+NcfpiK6e+ASbAVg37g="
+  }
+
+}

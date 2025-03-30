@@ -1,6 +1,6 @@
 ﻿using System.Net;
+using log4net;
 using Microsoft.Azure.Cosmos;
-using Microsoft.Extensions.Logging;
 using Visio.Domain.Core;
 
 namespace Visio.Data.Core.Db
@@ -9,9 +9,10 @@ namespace Visio.Data.Core.Db
     {
         protected readonly CosmosClient _cosmosClient;
         protected readonly Container _cosmosContainer;
-        protected readonly ILogger<Repository<TKey, TEntity>> _logger;
 
-        protected Repository(string tableName, RepositoryOptions entityDataStoreOptions, ILogger<Repository<TKey, TEntity>> logger)
+        protected static readonly ILog _logger = LogManager.GetLogger(typeof(Repository<TKey, TEntity>));
+
+        protected Repository(string tableName, RepositoryOptions entityDataStoreOptions)
         {
             if (string.IsNullOrWhiteSpace(tableName))
                 throw new ArgumentNullException(nameof(tableName));
@@ -19,12 +20,10 @@ namespace Visio.Data.Core.Db
             ArgumentNullException.ThrowIfNull(entityDataStoreOptions);
             ArgumentNullException.ThrowIfNull(entityDataStoreOptions.CosmosClient);
             ArgumentNullException.ThrowIfNull(entityDataStoreOptions.DatabaseId);
-            ArgumentNullException.ThrowIfNull(logger);
 
             _cosmosClient = entityDataStoreOptions.CosmosClient;
 
             _cosmosContainer = _cosmosClient.GetDatabase(entityDataStoreOptions.DatabaseId).GetContainer(tableName);
-            _logger = logger;
         }
 
         public async Task<TEntity> CreateAsync(TEntity entity)
@@ -34,12 +33,12 @@ namespace Visio.Data.Core.Db
             try
             {
                 var response = await _cosmosContainer.CreateItemAsync(entity, new PartitionKey(entity.Id.ToString()));
-                _logger.LogInformation("Entity added successfully with ID: {EntityId}", entity.Id);
+                _logger.InfoFormat("Entity added successfully with ID: {EntityId}", entity.Id);
                 return response.Resource;
             }
             catch (CosmosException ex)
             {
-                _logger.LogError(ex, "Failed to add entity with ID: {EntityId}", entity.Id);
+                _logger.ErrorFormat(ex.Message, "Failed to add entity with ID: {EntityId}", entity.Id);
                 throw;
             }
         }
@@ -53,11 +52,11 @@ namespace Visio.Data.Core.Db
             {
                 var itemResponse = await _cosmosContainer.DeleteItemAsync<TEntity>(id.ToString(), new PartitionKey(id.ToString()));
                 itemResponse.EnsureSuccessStatusCode();
-                _logger.LogInformation("Entity with ID: {EntityId} deleted successfully", id);
+                _logger.InfoFormat("Entity with ID: {EntityId} deleted successfully", id);
             }
             catch (CosmosException ex)
             {
-                _logger.LogError(ex, "Failed to delete entity with ID: {EntityId}", id);
+                _logger.ErrorFormat(ex.Message, "Failed to delete entity with ID: {EntityId}", id);
                 throw;
             }
         }
@@ -71,17 +70,17 @@ namespace Visio.Data.Core.Db
             {
                 var itemResponse = await _cosmosContainer.ReadItemAsync<TEntity>(id.ToString(), new PartitionKey(id.ToString()));
                 itemResponse.EnsureSuccessStatusCode();
-                _logger.LogInformation("Entity retrieved successfully with ID: {EntityId}", id);
+                _logger.InfoFormat("Entity retrieved successfully with ID: {EntityId}", id);
                 return itemResponse.Resource;
             }
             catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
-                _logger.LogWarning("Entity with ID: {EntityId} not found", id);
+                _logger.WarnFormat("Entity with ID: {EntityId} not found", id);
                 return null;
             }
             catch (CosmosException ex)
             {
-                _logger.LogError(ex, "Failed to retrieve entity with ID: {EntityId}", id);
+                _logger.ErrorFormat(ex.Message, "Failed to retrieve entity with ID: {EntityId}", id);
                 throw;
             }
         }
@@ -101,12 +100,12 @@ namespace Visio.Data.Core.Db
                     results.AddRange(response);
                 }
 
-                _logger.LogInformation("Successfully retrieved {EntityCount} entities", results.Count);
+                _logger.InfoFormat("Successfully retrieved {EntityCount} entities", results.Count);
                 return results;
             }
             catch (CosmosException ex)
             {
-                _logger.LogError(ex, "Failed to retrieve entities");
+                _logger.ErrorFormat(ex.Message, "Failed to retrieve entities");
                 throw;
             }
         }
@@ -119,11 +118,11 @@ namespace Visio.Data.Core.Db
             {
                 var itemResponse = await _cosmosContainer.ReplaceItemAsync(entity, entity.Id.ToString(), new PartitionKey(entity.Id.ToString()));
                 itemResponse.EnsureSuccessStatusCode();
-                _logger.LogInformation("Entity updated successfully with ID: {EntityId}", entity.Id);
+                _logger.InfoFormat("Entity updated successfully with ID: {EntityId}", entity.Id);
             }
             catch (CosmosException ex)
             {
-                _logger.LogError(ex, "Failed to update entity with ID: {EntityId}", entity.Id);
+                _logger.ErrorFormat(ex.Message, "Failed to update entity with ID: {EntityId}", entity.Id);
                 throw;
             }
         }

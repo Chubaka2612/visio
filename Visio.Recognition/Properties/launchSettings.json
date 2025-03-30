@@ -2,7 +2,7 @@
   "profiles": {
     "Visio.Recognition": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7100",
+      "commandLineArgs": "--port 7103",
       "launchBrowser": false
     }
   }
