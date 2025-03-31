@@ -8,4 +8,5 @@
 - Azure Service Bus - as notification service
 - Azure Service Bus - as tasks queue
 - Azure Load Balancer - as applications entry point
+  
 **See Visio.Schemas for Architecture Guidelines**
