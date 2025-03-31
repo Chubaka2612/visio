@@ -1,15 +1,11 @@
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Fluent;
-using Visio.Data.Core;
 using Azure.Storage.Blobs;
 using Visio.Services.ImageService;
 using Visio.Data.Domain.Images;
 using Visio.Data.Core.Storage;
 using Visio.Data.Core.Db;
 using Visio.Services.Notifications;
-using Microsoft.Extensions.Options;
-using Azure.Messaging.ServiceBus;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Visio.Web
 {
