@@ -26,7 +26,7 @@ namespace Visio.Recognition
         private static readonly string AzureCosmosDatabaseId = Environment.GetEnvironmentVariable("AzureCosmosOptions.DatabaseId");
 
         [FunctionName(nameof(VisionRecognitionFunction))]
-        public async Task Run([ServiceBusTrigger("visiotesttopic", "visiotestsbs", Connection = "AzureServiceBusConnection")] ServiceBusReceivedMessage message,
+        public async Task Run([ServiceBusTrigger("%ServiceBusTopic%", "%ServiceBusSubscription%", Connection = "AzureServiceBusConnection")] ServiceBusReceivedMessage message,
             ServiceBusMessageActions messageActions,
             ILogger log)
         {

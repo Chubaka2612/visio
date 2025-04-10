@@ -360,3 +360,33 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/
+*.tfvars
+
+# .NET Build Artifacts
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs and Temporary Files
+*.log
+*.bak
+*.swp
+*.swo
+
+# IDE-specific files
+.vs/
+
+# Azure/Credentials and Keys
+*.azureauth
+*.pem
+*.key
+*.pfx
+*.crt
