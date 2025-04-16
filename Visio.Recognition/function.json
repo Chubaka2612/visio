@@ -1,0 +1,15 @@
+﻿{
+  "bindings": [
+    {
+      "name": "message",
+      "type": "serviceBusTrigger",
+      "direction": "in",
+      "topicName": "%ServiceBusTopic%",
+      "subscriptionName": "%ServiceBusSubscription%",
+      "connection": "AzureServiceBusConnection"
+    }
+  ],
+  "disabled": false,
+  "scriptFile": "../bin/Visio.Recognition.dll",
+  "entryPoint": "Visio.Visio.Recognition.VisionRecognitionFunction.Run"
+}
