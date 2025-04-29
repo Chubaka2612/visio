@@ -365,7 +365,6 @@ FodyWeavers.xsd
 *.tfstate
 *.tfstate.backup
 .terraform/
-*.tfvars
 
 # .NET Build Artifacts
 bin/
