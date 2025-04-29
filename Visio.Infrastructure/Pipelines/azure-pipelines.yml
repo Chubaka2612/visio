@@ -1,0 +1,23 @@
+name: $(Date:dd-MM-yyyy).$(Rev:r)
+
+trigger: none
+
+pool:
+  name: Azure Pipelines
+  vmImage: "Windows-latest"
+
+stages:
+- template: templates/terraform-apply-with-confirmation.yml
+  parameters:
+    variable_group: visio_variable_group
+    environment: dev
+
+- template: templates/terraform-apply-with-confirmation.yml
+  parameters:
+    variable_group: visio_variable_group
+    environment: qa
+
+# - template: templates/terraform-apply-with-confirmation.yml
+#   parameters:
+#     variable_group: shared
+#     environment: prod

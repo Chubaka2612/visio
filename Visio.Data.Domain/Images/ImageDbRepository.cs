@@ -5,7 +5,7 @@ using Visio.Domain.Common.Images;
 
 namespace Visio.Data.Domain.Images
 {
-    public class ImageDbRepository(RepositoryOptions options) : Repository<string, ImageEntity>("images-audit", options), IImageRepository
+    public class ImageDbRepository(RepositoryOptions options) : Repository<string, ImageEntity>("images", options), IImageRepository
     {
 
         public async Task<IEnumerable<ImageEntity>> ReadAllAsync()
