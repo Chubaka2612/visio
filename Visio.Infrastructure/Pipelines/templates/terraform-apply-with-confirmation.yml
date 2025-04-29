@@ -1,0 +1,112 @@
+parameters:
+- name: 'variable_group'
+  type: string
+  default: ""
+- name: environment
+  default: ""
+
+stages:
+- stage:
+  displayName: ${{ parameters.environment }}
+  variables:
+    - group: ${{ parameters.variable_group }}
+    - name: environment
+      value: ${{ parameters.environment }}
+    - name: TF_IN_AUTOMATION
+      value: true
+    - name: TF_INPUT
+      value: false
+  jobs:
+    - job: plan
+      steps:
+        - task: PowerShell@2
+          displayName: 'Install Terraform'
+          inputs:
+            targetType: inline
+        - powershell: |
+            $terraformVersion = "1.5.5"
+            $url = "https://releases.hashicorp.com/terraform/$($terraformVersion)/terraform_$($terraformVersion)_windows_amd64.zip"
+            Invoke-WebRequest -Uri $url -OutFile terraform.zip
+            Expand-Archive -Path terraform.zip -DestinationPath C:\Terraform -Force
+            C:\Terraform\terraform.exe -version                  
+        - task: PowerShell@2
+          displayName: 'Replace Tokens'
+          inputs:
+            targetType: inline
+            script: 'gci env:| ForEach-Object {$n=$_.name;$v=$_.value;gci "./*" -Include "*.tf", "*.tfvars", "*.conf" -r -af| ForEach-Object {$f=$_.fullname;(gc $f) -replace "__$($n)__","$($v)"|Set-Content $f}}'
+            pwsh: true
+          env:
+            SubscriptionID: $(SubscriptionID)
+            CIAzureClientID: $(CIAzureClientID)
+            CIAzureClientSecret: $(CIAzureClientSecret)
+            TenantID: $(TenantID)
+        - script: |
+            C:\Terraform\terraform.exe init -no-color
+            C:\Terraform\terraform.exe validate
+            C:\Terraform\terraform.exe state list
+            C:\Terraform\terraform.exe plan  -lock=false -var-file="variables/$(environment).tfvars" -var CIAzureClientSecret="$(CIAzureClientSecret)" -no-color -out=$(environment).plan
+          displayName: 'Terraform Plan'
+        - task: CopyFiles@2
+          inputs:
+            contents: '$(environment).plan'
+            targetFolder: $(Build.ArtifactStagingDirectory)
+        - task: PublishBuildArtifacts@1
+          inputs:
+            PathtoPublish: $(Build.ArtifactStagingDirectory)
+            ArtifactName: $(environment).plan
+    - job: approve
+      dependsOn: plan
+      pool: server
+      timeoutInMinutes: 120 # 2 hours
+      steps:
+        - task: ManualValidation@0
+          displayName: 'Manual Validation'
+          inputs:
+            notifyUsers: 'viktoriia_skirko@epam.com'
+            instructions: 'Please review planned infrastructure changes before continuing.'
+    - job: apply
+      dependsOn: [plan, approve]
+      condition: succeeded()
+      steps:
+        - task: PowerShell@2
+          displayName: 'Install Terraform'
+          inputs:
+            targetType: inline
+        - powershell: |
+            $terraformVersion = "1.5.5"
+            $url = "https://releases.hashicorp.com/terraform/$($terraformVersion)/terraform_$($terraformVersion)_windows_amd64.zip"
+            Invoke-WebRequest -Uri $url -OutFile terraform.zip
+            Expand-Archive -Path terraform.zip -DestinationPath C:\Terraform -Force
+            C:\Terraform\terraform.exe -version                  
+        - task: PowerShell@2
+          displayName: 'Replace Tokens'
+          inputs:
+            targetType: inline
+            script: 'gci env:| ForEach-Object {$n=$_.name;$v=$_.value;gci "./*" -Include "*.tf", "*.tfvars", "*.conf" -r -af| ForEach-Object {$f=$_.fullname;(gc $f) -replace "__$($n)__","$($v)"|Set-Content $f}}'
+            pwsh: true
+          env:
+            SubscriptionID: $(SubscriptionID)
+            CIAzureClientID: $(CIAzureClientID)
+            CIAzureClientSecret: $(CIAzureClientSecret)
+            TenantID: $(TenantID)
+        - task: DownloadBuildArtifacts@0
+          inputs:
+            buildType: 'current'
+            downloadType: 'single'
+            artifactName: '$(environment).plan'
+            downloadPath: $(System.DefaultWorkingDirectory)
+        - script: |
+            C:\Terraform\terraform.exe init -no-color
+            C:\Terraform\terraform.exe validate
+            C:\Terraform\terraform.exe state list
+            C:\Terraform\terraform.exe show -no-color $(environment).plan/$(environment).plan
+            C:\Terraform\terraform.exe apply -lock=false -no-color $(environment).plan/$(environment).plan
+          displayName: 'Terraform Apply'
+        - powershell: |
+            C:\Terraform\terraform.exe output -json | Out-File outputs.json
+            $json = Get-Content outputs.json -ErrorAction Stop | Out-String | ConvertFrom-Json
+            foreach ($prop in $json.psobject.properties) {
+              Write-Host "##vso[task.setvariable variable=$($prop.Name);isOutput=true]$($prop.Value.value)"
+            }
+          name: outputs
+          displayName: 'Set Terraform Outputs as pipeline variables' 
