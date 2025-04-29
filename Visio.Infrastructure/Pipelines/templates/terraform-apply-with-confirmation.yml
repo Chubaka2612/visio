@@ -33,7 +33,16 @@ stages:
           displayName: 'Replace Tokens'
           inputs:
             targetType: inline
-            script: 'gci env:| ForEach-Object {$n=$_.name;$v=$_.value;gci "./*" -Include "*.tf", "*.tfvars", "*.conf" -r -af| ForEach-Object {$f=$_.fullname;(gc $f) -replace "__$($n)__","$($v)"|Set-Content $f}}'
+            script: |
+                cd $(Build.SourcesDirectory)/Visio.Infrastructure
+                gci env: | ForEach-Object {
+                  $n=$_.name
+                  $v=$_.value
+                  gci "./*" -Include "*.tf", "*.tfvars", "*.conf" -r -af | ForEach-Object {
+                    $f=$_.fullname
+                    (gc $f) -replace "__$($n)__", "$($v)" | Set-Content $f
+                  }
+                }
             pwsh: true
           env:
             SubscriptionID: $(SubscriptionID)
@@ -41,14 +50,15 @@ stages:
             CIAzureClientSecret: $(CIAzureClientSecret)
             TenantID: $(TenantID)
         - script: |
+            cd $(Build.SourcesDirectory)/Visio.Infrastructure
             C:\Terraform\terraform.exe init -no-color
             C:\Terraform\terraform.exe validate
             C:\Terraform\terraform.exe state list
-            C:\Terraform\terraform.exe plan  -lock=false -var-file="variables/$(environment).tfvars" -var CIAzureClientSecret="$(CIAzureClientSecret)" -no-color -out=$(environment).plan
+            C:\Terraform\terraform.exe plan  -lock=false -var-file="variables/$(environment).tfvars" -no-color -out=$(environment).plan
           displayName: 'Terraform Plan'
         - task: CopyFiles@2
           inputs:
-            contents: '$(environment).plan'
+            contents: '$(Build.SourcesDirectory)/Visio.Infrastructure/$(environment).plan'
             targetFolder: $(Build.ArtifactStagingDirectory)
         - task: PublishBuildArtifacts@1
           inputs:
@@ -82,7 +92,16 @@ stages:
           displayName: 'Replace Tokens'
           inputs:
             targetType: inline
-            script: 'gci env:| ForEach-Object {$n=$_.name;$v=$_.value;gci "./*" -Include "*.tf", "*.tfvars", "*.conf" -r -af| ForEach-Object {$f=$_.fullname;(gc $f) -replace "__$($n)__","$($v)"|Set-Content $f}}'
+            script: |
+                cd $(Build.SourcesDirectory)/Visio.Infrastructure
+                gci env: | ForEach-Object {
+                  $n=$_.name
+                  $v=$_.value
+                  gci "./*" -Include "*.tf", "*.tfvars", "*.conf" -r -af | ForEach-Object {
+                    $f=$_.fullname
+                    (gc $f) -replace "__$($n)__", "$($v)" | Set-Content $f
+                  }
+                }
             pwsh: true
           env:
             SubscriptionID: $(SubscriptionID)
@@ -96,13 +115,15 @@ stages:
             artifactName: '$(environment).plan'
             downloadPath: $(System.DefaultWorkingDirectory)
         - script: |
+            cd $(Build.SourcesDirectory)/Visio.Infrastructure
             C:\Terraform\terraform.exe init -no-color
             C:\Terraform\terraform.exe validate
             C:\Terraform\terraform.exe state list
-            C:\Terraform\terraform.exe show -no-color $(environment).plan/$(environment).plan
-            C:\Terraform\terraform.exe apply -lock=false -no-color $(environment).plan/$(environment).plan
+            C:\Terraform\terraform.exe show -no-color $(System.DefaultWorkingDirectory)/$(environment).plan/Visio.Infrastructure/$(environment).plan
+            C:\Terraform\terraform.exe apply -lock=false -no-color $(System.DefaultWorkingDirectory)/$(environment).plan/Visio.Infrastructure/$(environment).plan
           displayName: 'Terraform Apply'
         - powershell: |
+            cd $(Build.SourcesDirectory)/Visio.Infrastructure
             C:\Terraform\terraform.exe output -json | Out-File outputs.json
             $json = Get-Content outputs.json -ErrorAction Stop | Out-String | ConvertFrom-Json
             foreach ($prop in $json.psobject.properties) {
