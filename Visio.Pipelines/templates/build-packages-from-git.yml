@@ -1,0 +1,98 @@
+parameters:
+  solution: '**/Visio.sln'
+  buildConfiguration: 'Release'
+  webProject: '**/Visio.Web/Visio.Web.csproj'
+  functionProject: '**/Visio.Recognition/Visio.Recognition.csproj'
+  testProject: '**/Visio.Tests/Visio.Tests.csproj'
+
+stages:
+- stage: Build
+  displayName: Build Stage
+
+  jobs:
+  - job: BuildAndTest
+    displayName: 'Build Web & Function + Run Unit Tests'
+    pool:
+      vmImage: 'windows-latest'
+
+    steps:
+    - task: NuGetToolInstaller@1
+      displayName: 'Install NuGet'
+
+    - task: NuGetCommand@2
+      displayName: 'Restore NuGet packages'
+      inputs:
+        restoreSolution: '${{ parameters.solution }}'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build Web Project'
+      inputs:
+        command: 'build'
+        projects: '${{ parameters.webProject }}'
+        arguments: '--configuration ${{ parameters.buildConfiguration }}'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build Function Project'
+      inputs:
+        command: 'build'
+        projects: '${{ parameters.functionProject }}'
+        arguments: '--configuration ${{ parameters.buildConfiguration }}'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Run Unit Tests'
+      inputs:
+        command: 'test'
+        projects: '${{ parameters.testProject }}'
+        arguments: '--configuration ${{ parameters.buildConfiguration }} --logger:trx'
+
+    - task: PublishTestResults@2
+      displayName: 'Publish Test Results'
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFormat: 'VSTest'
+        testResultsFiles: '**/TestResults/*.trx'
+        failTaskOnFailedTests: true
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish Web Project'
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        projects: '${{ parameters.webProject }}'
+        arguments: '--configuration ${{ parameters.buildConfiguration }} --output $(Build.ArtifactStagingDirectory)/publish-web'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish Function Project'
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        projects: '${{ parameters.functionProject }}'
+        arguments: '--configuration ${{ parameters.buildConfiguration }} --output $(Build.ArtifactStagingDirectory)/publish-func'
+
+    - task: ArchiveFiles@2
+      displayName: 'Archive Web Zip'
+      inputs:
+        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/publish-web'
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/publish-web.zip'
+        includeRootFolder: false
+
+    - task: ArchiveFiles@2
+      displayName: 'Archive Function Zip'
+      inputs:
+        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/publish-func'
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/publish-func.zip'
+        includeRootFolder: false
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Web Artifact'
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)/publish-web.zip'
+        artifactName: 'web-drop'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Function Artifact'
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)/publish-func.zip'
+        artifactName: 'function-drop'

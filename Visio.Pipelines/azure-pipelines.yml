@@ -1,0 +1,21 @@
+name: $(Date:dd-MM-yyyy).$(Rev:r)
+
+trigger:
+  - none
+
+pool:
+  vmImage: "windows-latest"
+
+variables:
+  buildConfiguration: 'Release'
+
+stages:
+- template:  templates/build-packages-from-git.yml
+
+- template: approve.yml
+  parameters:
+    environment: dev
+
+- template: approve.yml
+  parameters:
+    environment: qa

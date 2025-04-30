@@ -1,0 +1,18 @@
+parameters:
+- name: environment
+  default: ""
+
+stages:
+- stage: Approve_${{ parameters.environment }}
+  displayName: Approve_${{ parameters.environment }}
+  
+  jobs:
+  - job: approve
+    pool: server
+    timeoutInMinutes: 120 # 2 hours
+    steps:
+    - task: ManualValidation@0
+      displayName: 'Manual Validation'
+      inputs:
+        notifyUsers: 'viktoriia_skirko@epam.com'
+        instructions: 'Please approve deploy on environment'
