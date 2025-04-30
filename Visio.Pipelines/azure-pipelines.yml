@@ -12,10 +12,10 @@ variables:
 stages:
 - template:  templates/build-packages-from-git.yml
 
-- template: approve.yml
+- template: templates/approve.yml
   parameters:
     environment: dev
 
-- template: approve.yml
+- template: templates/approve.yml
   parameters:
     environment: qa
