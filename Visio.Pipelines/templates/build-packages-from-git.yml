@@ -6,12 +6,12 @@ parameters:
   testProject: '**/Visio.Tests/Visio.Tests.csproj'
 
 stages:
-- stage: Build
-  displayName: Build Stage
+- stage: BuildAndTest
+  displayName: Build & Test
 
   jobs:
-  - job: BuildAndTest
-    displayName: 'Build Web & Function + Run Unit Tests'
+  - job: BuildAndPackage
+    displayName: 'Build Web & Function'
     pool:
       vmImage: 'windows-latest'
 
@@ -23,20 +23,6 @@ stages:
       displayName: 'Restore NuGet packages'
       inputs:
         restoreSolution: '${{ parameters.solution }}'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'Build Web Project'
-      inputs:
-        command: 'build'
-        projects: '${{ parameters.webProject }}'
-        arguments: '--configuration ${{ parameters.buildConfiguration }}'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'Build Function Project'
-      inputs:
-        command: 'build'
-        projects: '${{ parameters.functionProject }}'
-        arguments: '--configuration ${{ parameters.buildConfiguration }}'
 
     - task: DotNetCoreCLI@2
       displayName: 'Run Unit Tests'
@@ -53,38 +39,63 @@ stages:
         testResultsFiles: '**/TestResults/*.trx'
         failTaskOnFailedTests: true
 
+    # Build Web Project
     - task: DotNetCoreCLI@2
-      displayName: 'Publish Web Project'
+      displayName: 'Build Web Project'
       inputs:
-        command: 'publish'
-        publishWebProjects: false
+        command: 'build'
         projects: '${{ parameters.webProject }}'
-        arguments: '--configuration ${{ parameters.buildConfiguration }} --output $(Build.ArtifactStagingDirectory)/publish-web'
+        arguments: '--configuration ${{ parameters.buildConfiguration }} --output $(Build.ArtifactStagingDirectory)/Output/WebApp'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Publish Function Project'
+    # Copy web.config
+    - task: CopyFiles@2
+      displayName: 'Copy web.config'
       inputs:
-        command: 'publish'
-        publishWebProjects: false
-        projects: '${{ parameters.functionProject }}'
-        arguments: '--configuration ${{ parameters.buildConfiguration }} --output $(Build.ArtifactStagingDirectory)/publish-func'
+        sourceFolder: '$(Build.SourcesDirectory)/Visio.Web'
+        contents: 'web.config'
+        targetFolder: '$(Build.ArtifactStagingDirectory)/Output/WebApp'
+    
+    - task: CopyFiles@2
+      displayName: 'Copy static'
+      inputs:
+        sourceFolder: '$(Build.SourcesDirectory)/Visio.Web/wwwroot'
+        contents: '**'
+        targetFolder: '$(Build.ArtifactStagingDirectory)/Output/WebApp/wwwroot'
 
+    # List the contents of the WebApp folder for debugging
+    - task: PowerShell@2
+      displayName: 'List Contents of WebApp Folder'
+      inputs:
+        targetType: 'inline'
+        script: 'Get-ChildItem -Recurse "$(Build.ArtifactStagingDirectory)/Output/WebApp"'
+  
+    # Archive Web App
     - task: ArchiveFiles@2
       displayName: 'Archive Web Zip'
       inputs:
-        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/publish-web'
+        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/Output/WebApp'
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/publish-web.zip'
         includeRootFolder: false
 
+    # Build Function Project
+    - task: DotNetCoreCLI@2
+      displayName: 'Build Function Project'
+      inputs:
+        command: 'build'
+        projects: '${{ parameters.functionProject }}'
+        arguments: '--configuration ${{ parameters.buildConfiguration }} --output $(Build.ArtifactStagingDirectory)/Output/FunctionApp'
+
+    # Archive Function App
     - task: ArchiveFiles@2
       displayName: 'Archive Function Zip'
       inputs:
-        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/publish-func'
+        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/Output/FunctionApp'
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/publish-func.zip'
         includeRootFolder: false
 
+    # Publish Artifacts
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Web Artifact'
       inputs:

@@ -4,7 +4,7 @@ parameters:
 
 stages:
 - stage: Approve_${{ parameters.environment }}
-  displayName: Approve_${{ parameters.environment }}
+  displayName: Approve ${{ parameters.environment }}
   
   jobs:
   - job: approve

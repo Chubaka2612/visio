@@ -1,0 +1,70 @@
+parameters:
+- name: 'variable_group'
+  type: string
+  default: ""
+- name: 'stage_name'
+  type: string
+- name: 'environment'
+  type: string
+
+stages:
+- stage: ${{ parameters.stage_name }}
+  displayName: Deploy to ${{ parameters.environment }}
+  variables:
+    - group: ${{ parameters.variable_group }}
+    - name: environment
+      value: ${{ parameters.environment }}
+
+  jobs:
+  - job: Deploy_WebApp_${{ parameters.environment }}
+    displayName: Deploy Web App
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Web Artifact'
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'web-drop'
+        downloadPath: '$(System.ArtifactsDirectory)'
+
+    - task: PowerShell@2
+      displayName: 'Deploy Web App via PowerShell'
+      inputs:
+        filePath: 'Visio.Pipelines/deploy-webapp.ps1'
+        arguments: >
+          -SubscriptionId $(SubscriptionId)
+          -ClientId $(CIAzureClientId)
+          -ClientSecret $(CIAzureClientSecret)
+          -TenantID $(TenantID)
+          -ResourceGroupName rg-visio-${{ parameters.environment }}-infra
+          -AppServiceName visio-${{ parameters.environment }}-web
+          -ZipFilePath "$(System.ArtifactsDirectory)/web-drop/publish-web.zip"
+
+  - job: Deploy_FunctionApp_${{ parameters.environment }}
+    displayName: Deploy Function App
+    dependsOn: Deploy_WebApp_${{ parameters.environment }}
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Function Artifact'
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'function-drop'
+        downloadPath: '$(System.ArtifactsDirectory)'
+
+    - task: PowerShell@2
+      displayName: 'Deploy Function App via PowerShell'
+      inputs:
+        filePath: 'Visio.Pipelines/deploy-webapp.ps1'
+        arguments: >
+          -SubscriptionId $(SubscriptionId)
+          -ClientId $(CIAzureClientId)
+          -ClientSecret $(CIAzureClientSecret)
+          -TenantID $(TenantID)
+          -ResourceGroupName rg-visio-${{ parameters.environment }}-infra
+          -AppServiceName visio-${{ parameters.environment }}-function
+          -ZipFilePath "$(System.ArtifactsDirectory)/function-drop/publish-func.zip"

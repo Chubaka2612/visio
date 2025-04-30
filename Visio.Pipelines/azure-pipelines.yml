@@ -12,10 +12,21 @@ variables:
 stages:
 - template:  templates/build-packages-from-git.yml
 
-- template: approve.yml
+- template: templates/approve.yml
   parameters:
     environment: dev
 
-- template: approve.yml
+- template: templates/deployment-webapp.yml
   parameters:
-    environment: qa
+    variable_group: 'visio_variable_group'
+    stage_name: Deploy_Dev
+    environment: 'dev'
+
+# - template: templates/approve.yml
+#   parameters:
+#     environment: qa
+
+# - template: templates/deployment-webapp.yml
+#   parameters:
+#     variable_group: 'visio_variable_group'
+#     environment: 'qa'

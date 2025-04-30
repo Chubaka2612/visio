@@ -31,8 +31,8 @@ dotnet publish $resolvedProjectPath -c Release -o $publishFolder
 Write-Host "Creating zip at: $zipFilePath"
 Compress-Archive -Path "$publishFolder\*" -DestinationPath $zipFilePath
 
-# Deploy with Azure CLI
-Write-Host "Deploying to Azure Web App: $AppServiceName in Resource Group: $ResourceGroup"
-az webapp deploy --resource-group $ResourceGroup --name $AppServiceName --src-path $zipFilePath
+# # Deploy with Azure CLI
+# Write-Host "Deploying to Azure Web App: $AppServiceName in Resource Group: $ResourceGroup"
+# az webapp deploy --resource-group $ResourceGroup --name $AppServiceName --src-path $zipFilePath
 
 Write-Host "Deployment complete!"
