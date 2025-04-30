@@ -16,8 +16,3 @@ stages:
   parameters:
     variable_group: visio_variable_group
     environment: qa
-
-# - template: templates/terraform-apply-with-confirmation.yml
-#   parameters:
-#     variable_group: shared
-#     environment: prod
